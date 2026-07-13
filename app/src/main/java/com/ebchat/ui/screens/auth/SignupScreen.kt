@@ -77,8 +77,10 @@ import com.ebchat.ui.theme.PinkLight
 import com.ebchat.ui.theme.PinkPrimary
 import com.ebchat.ui.theme.PinkPrimaryDark
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -383,7 +385,7 @@ fun SignupScreen(navController: NavHostController) {
                                     password.length < 6 -> errorMessage = "Password must be at least 6 characters"
                                     password != confirmPassword -> errorMessage = "Passwords do not match"
                                     else -> {
-                                        scope.launch {
+                                        scope.launch(Dispatchers.IO) {
                                             isLoading = true
                                             errorMessage = null
                                             try {
@@ -409,13 +411,17 @@ fun SignupScreen(navController: NavHostController) {
                                                 // Also save to Firestore
                                                 FirebaseConfig.usersCollection().document(userId).set(user.toMap()).await()
 
-                                                isLoading = false
-                                                navController.navigate(NavRoutes.MAIN) {
-                                                    popUpTo(NavRoutes.SIGNUP) { inclusive = true }
+                                                withContext(Dispatchers.Main) {
+                                                    isLoading = false
+                                                    navController.navigate(NavRoutes.MAIN) {
+                                                        popUpTo(NavRoutes.SIGNUP) { inclusive = true }
+                                                    }
                                                 }
                                             } catch (e: Exception) {
-                                                isLoading = false
-                                                errorMessage = e.message ?: "Registration failed"
+                                                withContext(Dispatchers.Main) {
+                                                    isLoading = false
+                                                    errorMessage = e.message ?: "Registration failed"
+                                                }
                                             }
                                         }
                                     }

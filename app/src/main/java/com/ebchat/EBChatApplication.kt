@@ -33,6 +33,11 @@ class EBChatApplication : Application() {
         // any UI code touches FirebaseConfig.database.
         FirebaseConfig.configurePersistence()
 
+        // Configure Firestore persistent cache on the MAIN thread, BEFORE
+        // any coroutine or UI code accesses Firestore. This prevents crashes
+        // when Firestore is lazily initialized from background threads.
+        FirebaseConfig.configureFirestore()
+
         try {
             FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG)
         } catch (e: Exception) {

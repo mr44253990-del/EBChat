@@ -44,7 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,9 +84,9 @@ fun ChatListScreen(navController: NavHostController) {
     var searchQuery by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Load chats
-    LaunchedEffect(userId) {
-        FirebaseConfig.chatsRef().addValueEventListener(object : ValueEventListener {
+    // Load chats with proper cleanup
+    DisposableEffect(userId) {
+        val chatsListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val chatList = mutableListOf<Chat>()
                 snapshot.children.forEach { child ->
@@ -116,12 +116,22 @@ fun ChatListScreen(navController: NavHostController) {
                 isLoading = false
             }
             override fun onCancelled(error: DatabaseError) { isLoading = false }
-        })
+        }
+
+        if (userId.isNotBlank()) {
+            FirebaseConfig.chatsRef().addValueEventListener(chatsListener)
+        }
+
+        onDispose {
+            if (userId.isNotBlank()) {
+                FirebaseConfig.chatsRef().removeEventListener(chatsListener)
+            }
+        }
     }
 
-    // Load users
-    LaunchedEffect(Unit) {
-        FirebaseConfig.usersRef().addValueEventListener(object : ValueEventListener {
+    // Load users with proper cleanup
+    DisposableEffect(Unit) {
+        val usersListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val userMap = mutableMapOf<String, User>()
                 snapshot.children.forEach { child ->
@@ -133,7 +143,13 @@ fun ChatListScreen(navController: NavHostController) {
                 users = userMap
             }
             override fun onCancelled(error: DatabaseError) {}
-        })
+        }
+
+        FirebaseConfig.usersRef().addValueEventListener(usersListener)
+
+        onDispose {
+            FirebaseConfig.usersRef().removeEventListener(usersListener)
+        }
     }
 
     val filteredChats = if (searchQuery.isBlank()) chats else chats.filter { chat ->

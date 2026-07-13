@@ -18,6 +18,10 @@ object FirebaseConfig {
     @Volatile
     private var persistenceConfigured: Boolean = false
 
+    // Firestore flag — must only be configured once, on the main thread
+    @Volatile
+    private var firestoreConfigured: Boolean = false
+
     // Firebase Instances
     val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     val database: FirebaseDatabase by lazy {
@@ -30,15 +34,7 @@ object FirebaseConfig {
     }
     val firestore: FirebaseFirestore by lazy {
         try {
-            FirebaseFirestore.getInstance().apply {
-                try {
-                    firestoreSettings = firestoreSettings {
-                        setLocalCacheSettings(persistentCacheSettings {})
-                    }
-                } catch (e: Exception) {
-                    Log.w(TAG, "Firestore cache settings already configured", e)
-                }
-            }
+            FirebaseFirestore.getInstance()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to init FirebaseFirestore", e)
             throw e
@@ -57,6 +53,27 @@ object FirebaseConfig {
             persistenceConfigured = true
         } catch (e: Exception) {
             Log.w(TAG, "Persistence already enabled or failed", e)
+        }
+    }
+
+    /**
+     * Call this ONLY once from Application.onCreate() on the MAIN thread,
+     * BEFORE any Firestore operations. Must be called after FirebaseApp.initializeApp().
+     * This prevents crashes when Firestore is lazily initialized from background coroutines.
+     */
+    fun configureFirestore() {
+        if (firestoreConfigured) return
+        try {
+            val instance = FirebaseFirestore.getInstance()
+            val settings = firestoreSettings {
+                setLocalCacheSettings(persistentCacheSettings {})
+            }
+            instance.firestoreSettings = settings
+            firestoreConfigured = true
+            Log.d(TAG, "Firestore configured with persistent cache")
+        } catch (e: Exception) {
+            Log.w(TAG, "Firestore configuration failed (may already be set)", e)
+            firestoreConfigured = true
         }
     }
 
