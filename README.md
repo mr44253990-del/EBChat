@@ -7,7 +7,7 @@ A feature-rich Android social media and messaging application built with **Kotli
 ### Authentication
 - Email/password authentication with Firebase Auth
 - Google Sign-In integration
-- User registration with name, email, phone, birth date, and gender
+- User registration with name, email, phone,irth date, and gender
 
 ### Messaging
 - Real-time one-to-one messaging
