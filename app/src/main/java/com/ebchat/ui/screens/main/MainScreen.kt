@@ -40,8 +40,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -92,20 +91,28 @@ fun MainScreen(navController: NavHostController) {
     var unreadCount by remember { mutableIntStateOf(0) }
     val userId = FirebaseConfig.getCurrentUserId()
 
-    // Listen for unread messages
-    LaunchedEffect(userId) {
-        if (userId.isNotBlank()) {
-            FirebaseConfig.chatsRef().addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    var count = 0
-                    snapshot.children.forEach { chatSnapshot ->
-                        val unreadMap = chatSnapshot.child("unreadCount").child(userId).getValue(Int::class.java)
-                        count += unreadMap ?: 0
-                    }
-                    unreadCount = count
+    // Listen for unread messages with proper cleanup
+    DisposableEffect(userId) {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var count = 0
+                snapshot.children.forEach { chatSnapshot ->
+                    val unreadMap = chatSnapshot.child("unreadCount").child(userId).getValue(Int::class.java)
+                    count += unreadMap ?: 0
                 }
-                override fun onCancelled(error: DatabaseError) {}
-            })
+                unreadCount = count
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        }
+
+        if (userId.isNotBlank()) {
+            FirebaseConfig.chatsRef().addValueEventListener(listener)
+        }
+
+        onDispose {
+            if (userId.isNotBlank()) {
+                FirebaseConfig.chatsRef().removeEventListener(listener)
+            }
         }
     }
 

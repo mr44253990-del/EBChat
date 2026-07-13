@@ -81,8 +81,10 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
@@ -113,11 +115,11 @@ fun LoginScreen(navController: NavHostController) {
             try {
                 val account = task.getResult(ApiException::class.java)
                 val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                scope.launch {
+                scope.launch(Dispatchers.IO) {
                     isLoading = true
                     try {
                         auth.signInWithCredential(credential).await()
-                        // Save FCM token
+                        // Save FCM token on IO dispatcher
                         val userId = FirebaseConfig.getCurrentUserId()
                         if (userId.isNotBlank()) {
                             runCatching {
@@ -127,14 +129,18 @@ fun LoginScreen(navController: NavHostController) {
                             }.onFailure { Log.w("LoginScreen", "Google post-login update failed", it) }
                         }
 
-                        isLoading = false
-                        navController.navigate(NavRoutes.MAIN) {
-                            popUpTo(NavRoutes.LOGIN) { inclusive = true }
+                        withContext(Dispatchers.Main) {
+                            isLoading = false
+                            navController.navigate(NavRoutes.MAIN) {
+                                popUpTo(NavRoutes.LOGIN) { inclusive = true }
+                            }
                         }
                     } catch (e: Exception) {
                         Log.e("LoginScreen", "Google signInWithCredential failed", e)
-                        isLoading = false
-                        errorMessage = e.localizedMessage ?: e.message ?: "Login failed"
+                        withContext(Dispatchers.Main) {
+                            isLoading = false
+                            errorMessage = e.localizedMessage ?: e.message ?: "Login failed"
+                        }
                     }
                 }
             } catch (e: ApiException) {
@@ -297,13 +303,17 @@ fun LoginScreen(navController: NavHostController) {
                     TextButton(
                         onClick = {
                             if (email.isNotBlank()) {
-                                scope.launch {
+                                scope.launch(Dispatchers.IO) {
                                     try {
                                         auth.sendPasswordResetEmail(email).await()
-                                        Toast.makeText(context, "Reset email sent!", Toast.LENGTH_SHORT).show()
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(context, "Reset email sent!", Toast.LENGTH_SHORT).show()
+                                        }
                                     } catch (e: Exception) {
                                         Log.e("LoginScreen", "sendPasswordResetEmail failed", e)
-                                        errorMessage = e.localizedMessage ?: e.message ?: "Failed to send reset email"
+                                        withContext(Dispatchers.Main) {
+                                            errorMessage = e.localizedMessage ?: e.message ?: "Failed to send reset email"
+                                        }
                                     }
                                 }
                             } else {
@@ -328,13 +338,12 @@ fun LoginScreen(navController: NavHostController) {
                                 errorMessage = "Please fill in all fields"
                                 return@Button
                             }
-                            scope.launch {
+                            scope.launch(Dispatchers.IO) {
                                 isLoading = true
                                 errorMessage = null
                                 try {
-                                    auth.signInWithEmailAndPassword(email, password).await()
-                                    // Update online status
-                                    val userId = FirebaseConfig.getCurrentUserId()
+                                    val result = auth.signInWithEmailAndPassword(email, password).await()
+                                    val userId = result.user?.uid ?: ""
                                     if (userId.isNotBlank()) {
                                         runCatching {
                                             val token = FirebaseMessaging.getInstance().token.await()
@@ -343,14 +352,18 @@ fun LoginScreen(navController: NavHostController) {
                                         }.onFailure { Log.w("LoginScreen", "post-login update failed", it) }
                                     }
 
-                                    isLoading = false
-                                    navController.navigate(NavRoutes.MAIN) {
-                                        popUpTo(NavRoutes.LOGIN) { inclusive = true }
+                                    withContext(Dispatchers.Main) {
+                                        isLoading = false
+                                        navController.navigate(NavRoutes.MAIN) {
+                                            popUpTo(NavRoutes.LOGIN) { inclusive = true }
+                                        }
                                     }
                                 } catch (e: Exception) {
                                     Log.e("LoginScreen", "signInWithEmailAndPassword failed", e)
-                                    isLoading = false
-                                    errorMessage = e.localizedMessage ?: e.message ?: "Login failed"
+                                    withContext(Dispatchers.Main) {
+                                        isLoading = false
+                                        errorMessage = e.localizedMessage ?: e.message ?: "Login failed"
+                                    }
                                 }
                             }
                         },

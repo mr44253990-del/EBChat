@@ -48,6 +48,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EBChat"
         android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="34">
 
         <!-- Main Activity -->
