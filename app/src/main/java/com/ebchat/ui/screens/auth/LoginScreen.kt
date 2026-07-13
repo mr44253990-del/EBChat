@@ -121,8 +121,14 @@ fun LoginScreen(navController: NavHostController) {
                         val userId = FirebaseConfig.getCurrentUserId()
                         if (userId.isNotBlank()) {
                             runCatching {
-                                val token = FirebaseMessaging.getInstance().token.await()
-                                FirebaseConfig.usersRef().child(userId).child("fcmToken").setValue(token)
+                                try {
+                                    val token = FirebaseMessaging.getInstance().token.await()
+                                    if (!token.isNullOrBlank()) {
+                                        FirebaseConfig.usersRef().child(userId).child("fcmToken").setValue(token)
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w("LoginScreen", "Failed to get FCM token", e)
+                                }
                                 FirebaseConfig.usersRef().child(userId).child("isOnline").setValue(true)
                             }.onFailure { Log.w("LoginScreen", "Google post-login update failed", it) }
                         }
@@ -337,8 +343,14 @@ fun LoginScreen(navController: NavHostController) {
                                     val userId = FirebaseConfig.getCurrentUserId()
                                     if (userId.isNotBlank()) {
                                         runCatching {
-                                            val token = FirebaseMessaging.getInstance().token.await()
-                                            FirebaseConfig.usersRef().child(userId).child("fcmToken").setValue(token)
+                                            try {
+                                                val token = FirebaseMessaging.getInstance().token.await()
+                                                if (!token.isNullOrBlank()) {
+                                                    FirebaseConfig.usersRef().child(userId).child("fcmToken").setValue(token)
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.w("LoginScreen", "Failed to get FCM token", e)
+                                            }
                                             FirebaseConfig.usersRef().child(userId).child("isOnline").setValue(true)
                                         }.onFailure { Log.w("LoginScreen", "post-login update failed", it) }
                                     }

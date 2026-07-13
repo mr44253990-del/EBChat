@@ -104,8 +104,9 @@ fun PostFeedScreen(navController: NavHostController) {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val postList = mutableListOf<Post>()
                 snapshot.children.reversed().forEach { child ->
-                    val map = child.value as? Map<String, Any?>
-                    if (map != null) {
+                    val value = child.value
+                    if (value is Map<*, *>) {
+                        val map = value.mapKeys { it.key.toString() }
                         postList.add(Post.fromMap(map))
                     }
                 }
@@ -125,8 +126,9 @@ fun PostFeedScreen(navController: NavHostController) {
                 val storyMap = mutableMapOf<String, Story>()
                 snapshot.children.forEach { userStories ->
                     userStories.children.forEach { storySnap ->
-                        val map = storySnap.value as? Map<String, Any?>
-                        if (map != null) {
+                        val value = storySnap.value
+                        if (value is Map<*, *>) {
+                            val map = value.mapKeys { it.key.toString() }
                             val story = Story.fromMap(map)
                             if (story.isActive && !story.isDeleted) {
                                 storyMap[story.userId] = story

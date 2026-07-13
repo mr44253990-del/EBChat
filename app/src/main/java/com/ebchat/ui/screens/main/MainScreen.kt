@@ -99,8 +99,13 @@ fun MainScreen(navController: NavHostController) {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     var count = 0
                     snapshot.children.forEach { chatSnapshot ->
-                        val unreadMap = chatSnapshot.child("unreadCount").child(userId).getValue(Int::class.java)
-                        count += unreadMap ?: 0
+                        val unreadVal = chatSnapshot.child("unreadCount").child(userId).value
+                        val unread = when (unreadVal) {
+                            is Number -> unreadVal.toInt()
+                            is String -> unreadVal.toIntOrNull() ?: 0
+                            else -> 0
+                        }
+                        count += unread
                     }
                     unreadCount = count
                 }

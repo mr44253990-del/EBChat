@@ -78,13 +78,11 @@ fun EBChatApp() {
     var startDestination by remember { mutableStateOf(NavRoutes.ONBOARDING) }
 
     LaunchedEffect(Unit) {
+        // Only set startDestination once
+        val isLoggedIn = FirebaseConfig.isLoggedIn()
+        startDestination = if (isLoggedIn) NavRoutes.MAIN else NavRoutes.ONBOARDING
         delay(2000)
         showSplash = false
-        startDestination = if (FirebaseConfig.isLoggedIn()) {
-            NavRoutes.MAIN
-        } else {
-            NavRoutes.ONBOARDING
-        }
     }
 
     AnimatedVisibility(
@@ -153,6 +151,10 @@ fun EBChatApp() {
             }
             composable(NavRoutes.STORIES) {
                 StoryViewerScreen(navController = navController)
+            }
+            composable(NavRoutes.CREATE_STORY) {
+                // Placeholder for CreateStoryScreen if it exists, otherwise just a back action
+                Text("Create Story Screen Placeholder")
             }
             composable(
                 route = "story_viewer/{userId}",
