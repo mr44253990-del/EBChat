@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- EBChat chat-bubble foreground (for adaptive icon, 108x108 canvas with 18dp safe zone) -->
+    <group android:translateX="18" android:translateY="18">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,8
+                C32,8 14,24 14,44
+                C14,56 22,66 34,72
+                L30,86
+                C30,87 31,88 32,88
+                C32,88 32,88 33,88
+                L48,80
+                C50,80 52,80 54,80
+                C76,80 94,64 94,44
+                C94,24 76,8 54,8 Z" />
+        <path
+            android:fillColor="#FF4081"
+            android:pathData="M38,38
+                L70,38
+                C71,38 72,39 72,40
+                C72,41 71,42 70,42
+                L38,42
+                C37,42 36,41 36,40
+                C36,39 37,38 38,38 Z" />
+        <path
+            android:fillColor="#FF4081"
+            android:pathData="M38,50
+                L60,50
+                C61,50 62,51 62,52
+                C62,53 61,54 60,54
+                L38,54
+                C37,54 36,53 36,52
+                C36,51 37,50 38,50 Z" />
+    </group>
+</vector>
