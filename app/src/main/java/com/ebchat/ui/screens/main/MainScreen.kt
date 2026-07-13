@@ -83,6 +83,7 @@ sealed class BottomNavItem(
     object Settings : BottomNavItem("settings", "Settings", Icons.Filled.Settings, Icons.Outlined.Settings)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
     var selectedItem by remember { mutableIntStateOf(0) }
@@ -108,11 +109,12 @@ fun MainScreen(navController: NavHostController) {
 
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.Chat.copy(badgeCount = unreadCount),
+        BottomNavItem.Chat,
         BottomNavItem.Groups,
         BottomNavItem.Profile,
         BottomNavItem.Settings
     )
+    val badgeOverrides = mapOf(BottomNavItem.Chat to unreadCount)
 
     Scaffold(
         bottomBar = {
@@ -126,16 +128,17 @@ fun MainScreen(navController: NavHostController) {
                 tonalElevation = 8.dp
             ) {
                 items.forEachIndexed { index, item ->
+                    val effectiveBadge = badgeOverrides[item] ?: item.badgeCount
                     NavigationBarItem(
                         icon = {
                             BadgedBox(
                                 badge = {
-                                    if (item.badgeCount > 0) {
+                                    if (effectiveBadge > 0) {
                                         Badge(
                                             containerColor = PinkPrimary,
                                             contentColor = Color.White
                                         ) {
-                                            Text(item.badgeCount.toString())
+                                            Text(effectiveBadge.toString())
                                         }
                                     }
                                 }

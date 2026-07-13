@@ -63,6 +63,7 @@ android {
 dependencies {
     // Android Core
     implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Material Components (required for Theme.Material3.DayNight.NoActionBar in themes.xml)
     implementation("com.google.android.material:material:1.11.0")
@@ -94,7 +95,7 @@ dependencies {
     implementation("io.coil-kt:coil-video:2.5.0")
 
     // Supabase
-    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.0.4")
+    implementation("io.github.jan-tennert.supabase:auth-kt:2.0.4")
     implementation("io.github.jan-tennert.supabase:postgrest-kt:2.0.4")
     implementation("io.github.jan-tennert.supabase:storage-kt:2.0.4")
     implementation("io.github.jan-tennert.supabase:realtime-kt:2.0.4")

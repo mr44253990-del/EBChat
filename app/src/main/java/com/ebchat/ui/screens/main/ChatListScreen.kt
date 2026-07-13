@@ -60,6 +60,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.ebchat.ui.theme.PinkAccent
 import coil.compose.AsyncImage
 import com.ebchat.data.model.Chat
 import com.ebchat.data.model.MessageStatus
