@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.EBChat" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/pink_primary</item>
+        <item name="colorPrimaryDark">@color/pink_primary_dark</item>
+        <item name="colorAccent">@color/pink_accent</item>
+        <item name="android:statusBarColor">@color/pink_primary</item>
+        <item name="android:navigationBarColor">@color/glass_surface</item>
+        <item name="android:windowBackground">@color/glass_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.EBChat.Splash" parent="Theme.EBChat">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@color/pink_primary</item>
+        <item name="android:navigationBarColor">@color/pink_primary</item>
+    </style>
+</resources>
