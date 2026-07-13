@@ -7,6 +7,8 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.net.Uri
 import android.os.Build
+import android.util.Log
+import com.ebchat.data.remote.FirebaseConfig
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Logger
@@ -14,24 +16,49 @@ import com.google.firebase.messaging.FirebaseMessaging
 
 class EBChatApplication : Application() {
 
+    private val tag = "EBChatApplication"
+
     override fun onCreate() {
         super.onCreate()
 
-        // Initialize Firebase
-        FirebaseApp.initializeApp(this)
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
-        FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG)
+        // Initialize Firebase safely — wrap in try/catch so any failure
+        // does not crash the app on launch.
+        try {
+            FirebaseApp.initializeApp(this)
+        } catch (e: Exception) {
+            Log.e(tag, "FirebaseApp.initializeApp failed", e)
+        }
 
-        // Subscribe to global topic
-        FirebaseMessaging.getInstance().subscribeToTopic("all_users")
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    println("Subscribed to all_users topic")
+        // Configure Realtime Database persistence exactly once, before
+        // any UI code touches FirebaseConfig.database.
+        FirebaseConfig.configurePersistence()
+
+        try {
+            FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG)
+        } catch (e: Exception) {
+            Log.w(tag, "Failed to set log level", e)
+        }
+
+        // Subscribe to global topic — best-effort, must not crash app
+        try {
+            FirebaseMessaging.getInstance().subscribeToTopic("all_users")
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(tag, "Subscribed to all_users topic")
+                    } else {
+                        Log.w(tag, "Failed to subscribe to all_users", task.exception)
+                    }
                 }
-            }
+        } catch (e: Exception) {
+            Log.w(tag, "subscribeToTopic failed", e)
+        }
 
         // Create notification channels
-        createNotificationChannels()
+        try {
+            createNotificationChannels()
+        } catch (e: Exception) {
+            Log.e(tag, "createNotificationChannels failed", e)
+        }
     }
 
     private fun createNotificationChannels() {

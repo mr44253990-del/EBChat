@@ -1,5 +1,6 @@
 package com.ebchat.data.remote
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,22 +12,53 @@ import com.google.firebase.storage.storageMetadata
 
 object FirebaseConfig {
 
+    private const val TAG = "FirebaseConfig"
+
+    // Persistence flag — must only be set once in Application.onCreate()
+    @Volatile
+    private var persistenceConfigured: Boolean = false
+
     // Firebase Instances
     val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     val database: FirebaseDatabase by lazy {
-        FirebaseDatabase.getInstance().apply {
-            setPersistenceEnabled(true)
+        try {
+            FirebaseDatabase.getInstance()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to init FirebaseDatabase", e)
+            throw e
         }
     }
     val firestore: FirebaseFirestore by lazy {
-        FirebaseFirestore.getInstance().apply {
-            firestoreSettings = firestoreSettings {
-                setLocalCacheSettings(persistentCacheSettings {})
+        try {
+            FirebaseFirestore.getInstance().apply {
+                try {
+                    firestoreSettings = firestoreSettings {
+                        setLocalCacheSettings(persistentCacheSettings {})
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Firestore cache settings already configured", e)
+                }
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to init FirebaseFirestore", e)
+            throw e
         }
     }
     val storage: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
     val messaging: FirebaseMessaging by lazy { FirebaseMessaging.getInstance() }
+
+    /**
+     * Call this ONLY once from Application.onCreate() before any other Firebase access.
+     */
+    fun configurePersistence() {
+        if (persistenceConfigured) return
+        try {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+            persistenceConfigured = true
+        } catch (e: Exception) {
+            Log.w(TAG, "Persistence already enabled or failed", e)
+        }
+    }
 
     // Database References
     fun usersRef() = database.getReference("users")

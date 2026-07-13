@@ -1,6 +1,7 @@
 package com.ebchat.ui.screens.auth
 
 import android.app.Activity
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -117,23 +118,29 @@ fun LoginScreen(navController: NavHostController) {
                     try {
                         auth.signInWithCredential(credential).await()
                         // Save FCM token
-                        val token = FirebaseMessaging.getInstance().token.await()
                         val userId = FirebaseConfig.getCurrentUserId()
-                        FirebaseConfig.usersRef().child(userId).child("fcmToken").setValue(token)
-                        FirebaseConfig.usersRef().child(userId).child("isOnline").setValue(true)
+                        if (userId.isNotBlank()) {
+                            runCatching {
+                                val token = FirebaseMessaging.getInstance().token.await()
+                                FirebaseConfig.usersRef().child(userId).child("fcmToken").setValue(token)
+                                FirebaseConfig.usersRef().child(userId).child("isOnline").setValue(true)
+                            }.onFailure { Log.w("LoginScreen", "Google post-login update failed", it) }
+                        }
 
                         isLoading = false
                         navController.navigate(NavRoutes.MAIN) {
                             popUpTo(NavRoutes.LOGIN) { inclusive = true }
                         }
                     } catch (e: Exception) {
+                        Log.e("LoginScreen", "Google signInWithCredential failed", e)
                         isLoading = false
-                        errorMessage = e.message
+                        errorMessage = e.localizedMessage ?: e.message ?: "Login failed"
                     }
                 }
             } catch (e: ApiException) {
+                Log.e("LoginScreen", "Google Sign-In failed", e)
                 isLoading = false
-                errorMessage = "Google Sign-In failed: ${e.message}"
+                errorMessage = "Google Sign-In failed: ${e.localizedMessage ?: e.message ?: e.statusCode.toString()}"
             }
         }
     }
@@ -295,7 +302,8 @@ fun LoginScreen(navController: NavHostController) {
                                         auth.sendPasswordResetEmail(email).await()
                                         Toast.makeText(context, "Reset email sent!", Toast.LENGTH_SHORT).show()
                                     } catch (e: Exception) {
-                                        errorMessage = e.message
+                                        Log.e("LoginScreen", "sendPasswordResetEmail failed", e)
+                                        errorMessage = e.localizedMessage ?: e.message ?: "Failed to send reset email"
                                     }
                                 }
                             } else {
@@ -327,17 +335,22 @@ fun LoginScreen(navController: NavHostController) {
                                     auth.signInWithEmailAndPassword(email, password).await()
                                     // Update online status
                                     val userId = FirebaseConfig.getCurrentUserId()
-                                    val token = FirebaseMessaging.getInstance().token.await()
-                                    FirebaseConfig.usersRef().child(userId).child("fcmToken").setValue(token)
-                                    FirebaseConfig.usersRef().child(userId).child("isOnline").setValue(true)
+                                    if (userId.isNotBlank()) {
+                                        runCatching {
+                                            val token = FirebaseMessaging.getInstance().token.await()
+                                            FirebaseConfig.usersRef().child(userId).child("fcmToken").setValue(token)
+                                            FirebaseConfig.usersRef().child(userId).child("isOnline").setValue(true)
+                                        }.onFailure { Log.w("LoginScreen", "post-login update failed", it) }
+                                    }
 
                                     isLoading = false
                                     navController.navigate(NavRoutes.MAIN) {
                                         popUpTo(NavRoutes.LOGIN) { inclusive = true }
                                     }
                                 } catch (e: Exception) {
+                                    Log.e("LoginScreen", "signInWithEmailAndPassword failed", e)
                                     isLoading = false
-                                    errorMessage = e.message ?: "Login failed"
+                                    errorMessage = e.localizedMessage ?: e.message ?: "Login failed"
                                 }
                             }
                         },
