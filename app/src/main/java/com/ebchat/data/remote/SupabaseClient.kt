@@ -1,15 +1,15 @@
 package com.ebchat.data.remote
 
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.gotrue
-import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.realtime.Realtime
-import io.github.jan.supabase.realtime.realtime
-import io.github.jan.supabase.storage.Storage
-import io.github.jan.supabase.storage.storage
+import io.github.jan-tennert.supabase.SupabaseClient
+import io.github.jan-tennert.supabase.createSupabaseClient
+import io.github.jan-tennert.supabase.gotrue.Auth
+import io.github.jan-tennert.supabase.gotrue.gotrue
+import io.github.jan-tennert.supabase.postgrest.Postgrest
+import io.github.jan-tennert.supabase.postgrest.postgrest
+import io.github.jan-tennert.supabase.realtime.Realtime
+import io.github.jan-tennert.supabase.realtime.realtime
+import io.github.jan-tennert.supabase.storage.Storage
+import io.github.jan-tennert.supabase.storage.storage
 
 object SupabaseClient {
 
