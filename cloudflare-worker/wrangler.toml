@@ -1,0 +1,18 @@
+name = "ebchat-notifications"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# KV Namespaces
+[[kv_namespaces]]
+binding = "EBCHAT_TOKENS"
+id = "your_kv_namespace_id"
+
+# Environment Variables (set via wrangler secret)
+[vars]
+# FIREBASE_PRIVATE_KEY should be set as a secret: wrangler secret put FIREBASE_PRIVATE_KEY
+
+# Routes (optional - if using custom domain)
+# [[routes]]
+# pattern = "notifications.ebchat.app/*"
+# custom_domain = true
