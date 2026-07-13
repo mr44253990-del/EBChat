@@ -95,7 +95,7 @@ dependencies {
     implementation("io.coil-kt:coil-video:2.5.0")
 
     // Supabase
-    implementation("io.github.jan-tennert.supabase:auth-kt:2.0.4")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.0.4")
     implementation("io.github.jan-tennert.supabase:postgrest-kt:2.0.4")
     implementation("io.github.jan-tennert.supabase:storage-kt:2.0.4")
     implementation("io.github.jan-tennert.supabase:realtime-kt:2.0.4")
