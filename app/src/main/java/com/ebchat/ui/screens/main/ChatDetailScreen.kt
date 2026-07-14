@@ -422,6 +422,7 @@ fun ChatDetailScreen(navController: NavHostController, chatId: String) {
     }
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(
     message: Message,
