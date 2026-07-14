@@ -74,13 +74,13 @@ sealed class BottomNavItem(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
     val hasNews: Boolean = false,
-    val badgeCount: Int = 0
+    open val badgeCount: Int = 0
 ) {
-    data class Home(val dummy: Unit = Unit) : BottomNavItem("home", "Home", Icons.Filled.Home, Icons.Outlined.Home)
-    data class Chat(val dummy: Unit = Unit) : BottomNavItem("chat", "Chat", Icons.Filled.Chat, Icons.Outlined.Chat, badgeCount = 0)
-    data class Groups(val dummy: Unit = Unit) : BottomNavItem("groups", "Groups", Icons.Filled.Group, Icons.Outlined.Group)
-    data class Profile(val dummy: Unit = Unit) : BottomNavItem("profile", "Profile", Icons.Filled.Person, Icons.Outlined.Person)
-    data class Settings(val dummy: Unit = Unit) : BottomNavItem("settings", "Settings", Icons.Filled.Settings, Icons.Outlined.Settings)
+    data class Home(override val badgeCount: Int = 0) : BottomNavItem("home", "Home", Icons.Filled.Home, Icons.Outlined.Home)
+    data class Chat(override val badgeCount: Int = 0) : BottomNavItem("chat", "Chat", Icons.Filled.Chat, Icons.Outlined.Chat)
+    data class Groups(override val badgeCount: Int = 0) : BottomNavItem("groups", "Groups", Icons.Filled.Group, Icons.Outlined.Group)
+    data class Profile(override val badgeCount: Int = 0) : BottomNavItem("profile", "Profile", Icons.Filled.Person, Icons.Outlined.Person)
+    data class Settings(override val badgeCount: Int = 0) : BottomNavItem("settings", "Settings", Icons.Filled.Settings, Icons.Outlined.Settings)
 }
 
 @Composable
