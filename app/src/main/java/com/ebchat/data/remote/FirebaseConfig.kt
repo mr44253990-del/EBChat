@@ -13,11 +13,7 @@ object FirebaseConfig {
 
     // Firebase Instances
     val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
-    val database: FirebaseDatabase by lazy {
-        FirebaseDatabase.getInstance().apply {
-            setPersistenceEnabled(true)
-        }
-    }
+    val database: FirebaseDatabase by lazy { FirebaseDatabase.getInstance() }
     val firestore: FirebaseFirestore by lazy {
         FirebaseFirestore.getInstance().apply {
             firestoreSettings = firestoreSettings {
