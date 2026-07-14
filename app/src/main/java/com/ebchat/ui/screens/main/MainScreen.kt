@@ -76,11 +76,11 @@ sealed class BottomNavItem(
     val hasNews: Boolean = false,
     val badgeCount: Int = 0
 ) {
-    object Home : BottomNavItem("home", "Home", Icons.Filled.Home, Icons.Outlined.Home)
-    object Chat : BottomNavItem("chat", "Chat", Icons.Filled.Chat, Icons.Outlined.Chat, badgeCount = 0)
-    object Groups : BottomNavItem("groups", "Groups", Icons.Filled.Group, Icons.Outlined.Group)
-    object Profile : BottomNavItem("profile", "Profile", Icons.Filled.Person, Icons.Outlined.Person)
-    object Settings : BottomNavItem("settings", "Settings", Icons.Filled.Settings, Icons.Outlined.Settings)
+    data class Home(val dummy: Unit = Unit) : BottomNavItem("home", "Home", Icons.Filled.Home, Icons.Outlined.Home)
+    data class Chat(val dummy: Unit = Unit) : BottomNavItem("chat", "Chat", Icons.Filled.Chat, Icons.Outlined.Chat, badgeCount = 0)
+    data class Groups(val dummy: Unit = Unit) : BottomNavItem("groups", "Groups", Icons.Filled.Group, Icons.Outlined.Group)
+    data class Profile(val dummy: Unit = Unit) : BottomNavItem("profile", "Profile", Icons.Filled.Person, Icons.Outlined.Person)
+    data class Settings(val dummy: Unit = Unit) : BottomNavItem("settings", "Settings", Icons.Filled.Settings, Icons.Outlined.Settings)
 }
 
 @Composable
@@ -107,11 +107,11 @@ fun MainScreen(navController: NavHostController) {
     }
 
     val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Chat.copy(badgeCount = unreadCount),
-        BottomNavItem.Groups,
-        BottomNavItem.Profile,
-        BottomNavItem.Settings
+        BottomNavItem.Home(),
+        BottomNavItem.Chat().copy(badgeCount = unreadCount),
+        BottomNavItem.Groups(),
+        BottomNavItem.Profile(),
+        BottomNavItem.Settings()
     )
 
     Scaffold(

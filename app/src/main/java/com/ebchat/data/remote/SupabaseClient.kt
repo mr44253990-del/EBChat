@@ -2,8 +2,8 @@ package com.ebchat.data.remote
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.realtime.Realtime
@@ -21,7 +21,7 @@ object SupabaseClient {
             supabaseUrl = SUPABASE_URL,
             supabaseKey = SUPABASE_KEY
         ) {
-            install(GoTrue)
+            install(Auth)
             install(Postgrest)
             install(Storage)
             install(Realtime)
@@ -29,7 +29,7 @@ object SupabaseClient {
     }
 
     // Auth
-    val auth get() = client.gotrue
+    val auth get() = client.auth
 
     // Database
     val database get() = client.postgrest

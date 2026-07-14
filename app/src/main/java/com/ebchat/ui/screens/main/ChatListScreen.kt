@@ -68,6 +68,7 @@ import com.ebchat.data.remote.FirebaseConfig
 import com.ebchat.ui.theme.GlassSurface
 import com.ebchat.ui.theme.OnlineGreen
 import com.ebchat.ui.theme.PinkLight
+import com.ebchat.ui.theme.PinkAccent
 import com.ebchat.ui.theme.PinkPrimary
 import com.ebchat.ui.theme.PinkPrimaryDark
 import com.google.firebase.database.DataSnapshot
